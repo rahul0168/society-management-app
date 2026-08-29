@@ -21,6 +21,21 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
+| Auto-bypass interactive prompts in non-TTY cloud containers
+|--------------------------------------------------------------------------
+*/
+if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
+    $cliArgs = implode(' ', $_SERVER['argv']);
+    if (!str_contains($cliArgs, '--force') && (str_contains($cliArgs, 'migrate') || str_contains($cliArgs, 'db:seed') || str_contains($cliArgs, 'db:wipe'))) {
+        $_SERVER['argv'][] = '--force';
+    }
+    if (!str_contains($cliArgs, '--no-interaction')) {
+        $_SERVER['argv'][] = '--no-interaction';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Run The Artisan Application
 |--------------------------------------------------------------------------
 |
